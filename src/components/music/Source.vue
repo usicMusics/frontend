@@ -1,17 +1,17 @@
 <template>
   <div id="sourceList">
     <h2 style="font-size: 2em;">Music Sources</h2>
-    <draggable :options="{group:'music'}" @start="drag=true;" @add="unrate($event)" @end="drag=false">
+    <draggable :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
       <h2>SOURCE LIST</h2>
       <div v-if="!music.isMusic && rateChk(music)" v-bind:name="music._id" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"></div>
     </draggable>
-    <draggable :options="{group:'music'}" @start="drag=true;" @add="rate($event)" @end="drag=false">
+    <draggable :options="{group:'music'}" @start="drag=true" @add="rate($event)" @end="drag=false">
       <h2>FAVORITE</h2>
         <div v-if="!music.isMusic && !rateChk(music)" v-bind:name="music._id" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"></div>
     </draggable>
     <span>
       <context-menu id="context-menu" ref="ctxMenu" @ctx-open="ctxOpen">
-        <li @click="$modal.show('uploadSource')">소스 등록하기</li>
+        <!--<li @click="$modal.show('uploadSource')">소스 등록하기</li>-->
         <li>소스 만들기</li>
         <li @click="$modal.show('viewSource')">상세 정보보기</li>
         <li onclick="location.href='/music'">음악 목록</li>
@@ -62,13 +62,14 @@
     </modal>
     </span>
     <section id="trash">
-      <draggable :options="{group:'music'}" @start="drag=true;" @add="remove($event)" @end="drag=false;">
+      <draggable :options="{group:'music'}" @start="drag=true" @add="remove($event)" @end="drag=false">
         <span class="trash">
           <span></span>
           <i></i>
         </span>
       </draggable>
     </section>
+    <button @click="$modal.show('uploadSource')">소스 등록</button>
     <a href="/" style="color:gray;">Home @ usicMusic</a>
   </div>
 </template>
@@ -193,6 +194,7 @@ export default {
       })
     },
     uploadMusic: function () {
+      console.log('1')
       const form = document.getElementById('uploadForm')
       let formData = new FormData(form)
       this.$http.post('/api/music/upload', formData).then(response => {
@@ -206,7 +208,7 @@ export default {
     likeChk: function (rate) {
       var username = localStorage['username']
       for (var i = 0; i < rate.length; i++) {
-        if (username === rate[i].username) { return true } else return false
+        return username === rate[i].username
       }
     },
     like: function (id) {
@@ -318,7 +320,7 @@ export default {
   color: rgb(219, 86, 104);
 }
 .iform {
-  margin: 0px !important;
+  margin: 0 !important;
   cursor: pointer;
   color: rgb(160, 160, 160);
 }
@@ -345,8 +347,8 @@ export default {
 }
 section {
   position: fixed;
-  left: 0px;
-  bottom: 0px;
+  left: 0;
+  bottom: 0;
   margin:0;
   display: flex;
   padding:20px;

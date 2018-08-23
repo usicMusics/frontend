@@ -33,7 +33,7 @@
           </tr>
           </tbody>
           </table>
-          <a href="/" class="last" id="home">Home @ usicMusic</a>
+          <a href="/" class="last" id="index">Home @ usicMusic</a>
   </div>
 </template>
 

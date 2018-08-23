@@ -1,19 +1,22 @@
 <template>
   <div id="boardList">
-    <h2 style="font-size:2em;">게시판</h2>
     <modal name="creBoardModal" class="modal">
-      <h2 class="modal-header" style="text-align:right">글 작성
-        <span style="padding-left:178px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('creBoardModal')">X</span></h2>
-      <div style="padding:5% 8%; width:100%;">
-        <div style="float: left; padding-left:20px; line-height:28px">
-          <form action='' method="post" @submit.prevent="write()" enctype="multipart/form-data">
-            <input type="text" style="width:375px" name="title" placeholder="글 제목" id="title">
-            <textarea style="width:375px; height:120px;" size="1" type="text" name="content" placeholder="글 내용" id="content"></textarea><br>
-            <input type="submit" value="글 작성" class="tbtn">
+      <h2 class="modal-header">
+        <span>글 작성</span><span class="btn-close" @click="$modal.hide('creBoardModal')">&times;</span></h2>
+      <div class="modal-body">
+        <div>
+          <form action='#' method="post" @submit.prevent="write()" enctype="multipart/form-data">
+            <div class="form-group">
+              <input type="text" name="title" placeholder="글 제목" id="title">
+            </div>
+            <textarea size="1" type="text" name="content" placeholder="글 내용" id="content"></textarea><br>
+            <input type="submit" value="글 작성" class="btn">
           </form>
         </div>
       </div>
     </modal>
+    <div class="box">
+    <h2 style="font-size:2em;">게시판</h2>
     <table>
       <col width="5%">
       <col width="48%">
@@ -43,8 +46,8 @@
                 <div style="float: left; padding-left:20px; line-height:28px">
                   <p><strong>제목: {{board.title}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;작성자: {{board.writer}}</p>
                   <pre>내용: {{board.content}}</pre>
-                  <button class="btnWrite" style="padding:2px 20px !important; margin-top:110px; margin-left: -70px;" @click="modifyForm(board, index)">수정</button>
-                  <button class="btnWrite" style="padding:2px 20px !important; margin-top:100px;" @click="del(board._id, board.writer)">삭제</button>
+                  <button class="btn" style="padding:2px 20px !important; margin-top:110px; margin-left: -70px;" @click="modifyForm(board, index)">수정</button>
+                  <button class="btn" style="padding:2px 20px !important; margin-top:100px;" @click="del(board._id, board.writer)">삭제</button>
                   <form @submit.prevent="comment(board._id); $modal.hide('viewBoardModal' + (index + 1));">
                     <input type="text" name="comment" class="comment" placeholder="comment" id="comment" @keyup.enter="comment">
                     <button type="submit" class="cbtn">댓글</button>
@@ -52,18 +55,10 @@
                   <table id="commentTable" style="margin: 0px;">
                     <col width="5%">
                     <col width="80%">
-                    <!-- <col width="40%"> -->
                     <col width="15%">
-                    <!-- <tr>
-                        <th>작성자</th>
-                        <th>내용</th>
-                        <th>작성일</th>
-                        <th>삭제</th>
-                    </tr> -->
-                      <tr v-if="board.comments.length != 0" v-for="comment in board.comments" :key="comment._id">
+                      <tr v-if="board.comments.length !== 0" v-for="comment in board.comments" :key="comment._id">
                       <td>{{comment.name}}:</td>
                       <td style="text-align:left; padding-left:15px">{{comment.comment}}</td>
-                      <!-- <td style="font-size: .7em;">{{date(comment.date)}}</td> -->
                       <td><button @click="deleteComment(board._id, comment._id, comment.name)" id="commentDelete">삭제</button></td>
                     </tr>
                     <tr v-else>
@@ -77,12 +72,11 @@
               <h2 class="modal-header" style="text-align:right">글 수정
                 <span style="padding-left:178px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('editBoardModal' + (index + 1))">X</span></h2>
               <div style="padding:5% 8%; width:100%;">
-                <!-- <img width="150px" style="float: left;" v-bind:src="'http://10.80.162.221:3000' + music.cover" alt=""> -->
                 <div style="float: left; padding-left:20px; line-height:28px">
                   <form action='' method="post" @submit.prevent="edit(board._id)" enctype="multipart/form-data">
                     <input type="text" style="width:375px" name="title" placeholder="글 제목" id="etitle" v-bind:value="board.title">
                     <textarea style="width:375px; height:120px;" size="1" type="text" name="content" placeholder="글 내용" id="econtent" v-bind:value="board.content"></textarea><br>
-                    <input type="submit" value="글 수정" class="tbtn">
+                    <input type="submit" value="글 수정" class="tbtn btn">
                   </form>
                 </div>
               </div>
@@ -93,8 +87,9 @@
           </tr>
         </tbody>
     </table>
-    <button class="btnWrite" @click="$modal.show('creBoardModal')">WRITE</button><br>
-    <a href="/" style="margin-top:20px; font-size:1em;" id="home">Home @ usicMusic</a>
+      <button class="btn" @click="test()">WRITE</button><br>
+      <a href="/" style="margin-top:20px; font-size:1em;" class="btn-home">Home @ usicMusic</a>
+    </div>
   </div>
 </template>
 
@@ -126,7 +121,7 @@ export default {
       const title = document.getElementById('title').value
       const content = document.getElementById('content').value
       const writer = localStorage.getItem('username')
-      this.$http.post(`/api/board`, {title, content, writer})
+      this.$http.post('/api/board', {title, content, writer})
         .then((response) => {
           console.log(response.data)
         }).catch((error) => {
@@ -203,17 +198,29 @@ export default {
           // this.$js.alert(e)
           console.log(e)
         })
+    },
+    test: function () {
+      this.$modal.show('creBoardModal')
     }
   }
 }
 </script>
 
 <style scoped>
+  .box {
+    height: 700px;
+  }
 .comment {
   width: 260px;
   border: none;
   border-bottom: 1px solid rgb(204, 105, 105);
   outline: none;
+}
+.form-group {
+  margin: 0 0 10px 0;
+}
+.form-group input {
+  margin-left: 0;
 }
 .cbtn {
   background: none;
@@ -240,46 +247,32 @@ export default {
   color: white;
   background: rgb(204, 105, 105);
 }
-#boardList .modal-header {
-  background: url('../../assets/back.png');
-  line-height: 40px;
-  background-size: 100%;
-  color: white;
-}
-#boardList > table {
+.box > table {
   border-collapse: collapse;
   width: 80%;
   margin-top: 20px;
   margin-left:10%;
 }
-#boardList .btitle {
+.box .btitle {
   color: rgb(204, 105, 105) !important;
   cursor: pointer;
 }
-#boardList .btitle:hover {
+.box .btitle:hover {
   color: rgb(145, 98, 255) !important;
 }
-#boardList > table thead * {
+.box > table thead * {
   color: rgb(204, 105, 105);
 }
-#boardList > table thead tr {
+.box > table thead tr {
   line-height: 40px;
 }
-#boardList > table tbody tr {
+.box > table tbody tr {
   line-height: 30px;
 }
-#boardList > table tbody tr:hover {
+.box > table tbody tr:hover {
   background-color: rgb(245, 245, 245);
 }
-#boardList {
-  border-radius: 7px;
-  height: 750px;
-  box-shadow: 2px 2px 5px 1px lightgray;
-  width: 40%;
-  margin: 5% auto;
-  background-color: #fff;
-}
-#boardList > h2 {
+.box > h2 {
   color:white;
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
@@ -288,57 +281,29 @@ export default {
   background-size: 120%;
   background-position: 10% 12%;
 }
-#boardList > *:not(h2) {
+.box > *:not(h2) {
   padding: 10px 10%;
 }
-#boardList #title, #etitle {
+.box #title, #etitle {
   outline: none;
   border: none;
   border-bottom: 1px solid gray !important;
   padding: 3px 0;
   margin-bottom: 7px;
 }
-#boardList #title:focus, #etitle:focus {
-  border-bottom: 1px solid rgb(204, 105, 105) !important;
-}
-#boardList #content, #econtent {
+.box #content, #econtent {
   border-radius: 2px;
   height: 200px !important;
   resize: none;
   outline: none;
 }
-#boardList #content:focus, #econtent:focus {
-  border-color: rgb(204, 105, 105);
-}
-#boardList .tbtn {
-  outline: none;
-  cursor: pointer;
-  padding: 10px 0px;
-  width: 375px !important;
-  background-color: white;
-  color: rgb(204, 105, 105);
-  border: 1px solid rgb(204, 105, 105);
-  border-radius: 2px;
-}
-#boardList .tbtn:hover {
-  background-color: rgb(204, 105, 105);
-  color: white;
-}
-#boardList .btnWrite {
-  outline: none;
-  cursor: pointer;
-  border-radius: 2px;
-  /* margin-right: 10%; */
+.btn {
   position: relative;
-  right: -265px;
   margin: 10px 0 20px 0;
   color: rgb(204, 105, 105);
   border: 1px solid rgb(204, 105, 105);
   background-color: #fff;
   padding: 5px 20px !important;
 }
-#boardList .btnWrite:hover {
-  color: white;
-  background-color: rgb(204, 105, 105);
-}
+.btn:hover { color: white; background-color: rgb(204, 105, 105); }
 </style>

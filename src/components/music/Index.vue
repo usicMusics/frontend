@@ -33,7 +33,7 @@
           <modal v-bind:name="'modal' + (index + 1)" class="modal">
             <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">음악 상세보기<span style="padding-left:124px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('modal' + (index + 1))">X</span></h2>
             <div style="padding:5% 8%; width:100%;">
-              <img width="150px" style="float: left;" v-bind:src="this.$baseURL + music.cover" alt="">
+              <img width="150px" style="float: left;" v-bind:src="$baseURL + music.cover" alt="">
               <div style="float: left; padding-left:20px; line-height:28px">
                 <h3 class="modal-title">{{ music.title }}</h3>
                 <p>ARTIST: {{ music.artist }}</p>
@@ -78,7 +78,7 @@ export default {
   components: {
     draggable
   },
-  mounted () {
+  mounted: function () {
     // var baseURL = 'http://localhost:3000'
     var playlist = []
     if (localStorage['playlist'] === undefined) localStorage['playlist'] = JSON.stringify(playlist)
@@ -97,7 +97,6 @@ export default {
       console.log(error)
     }).then(() => {
       var arr = []
-      // console.log(this.musics)
       for (var i = 0; i < this.musics.length; i++) {
         if (!this.musics[i].isMusic) continue
         arr[i] = new Aplayer({
@@ -112,44 +111,49 @@ export default {
         })
         arr[i].pause()
       }
-      // 랭킹 1
-      var ranking1 = new Aplayer({
-        container: document.getElementById('ranking1'),
-        mini: true,
-        audio: [{
-          name: this.rank1.title,
-          artist: this.rank1.artist,
-          url: this.$baseURL + this.rank1.music,
-          cover: this.$baseURL + this.rank1.cover
-        }]
-      })
-      ranking1.pause()
-      console.log('' + this.rank2)
 
-      // 랭크 2
-      var ranking2 = new Aplayer({
-        container: document.getElementById('ranking2'),
-        mini: true,
-        audio: [{
-          name: this.rank2.title,
-          artist: this.rank2.artist,
-          url: this.$baseURL + this.rank2.music,
-          cover: this.$baseURL + this.rank2.cover
-        }]
-      })
-      ranking2.pause()
-      // 랭크 3
-      var ranking3 = new Aplayer({
-        container: document.getElementById('ranking3'),
-        mini: true,
-        audio: [{
-          name: this.rank3.title,
-          artist: this.rank3.artist,
-          url: this.$baseURL + this.rank3.music,
-          cover: this.$baseURL + this.rank3.cover
-        }]
-      })
-      ranking3.pause()
+      if (this.rank1) {
+        // 랭킹 1
+        var ranking1 = new Aplayer({
+          container: document.getElementById('ranking1'),
+          mini: true,
+          audio: [{
+            name: this.rank1.title,
+            artist: this.rank1.artist,
+            url: this.$baseURL + this.rank1.music,
+            cover: this.$baseURL + this.rank1.cover
+          }]
+        })
+        ranking1.pause()
+      }
+      if (this.rank2) {
+        // 랭크 2
+        var ranking2 = new Aplayer({
+          container: document.getElementById('ranking2'),
+          mini: true,
+          audio: [{
+            name: this.rank2.title,
+            artist: this.rank2.artist,
+            url: this.$baseURL + this.rank2.music,
+            cover: this.$baseURL + this.rank2.cover
+          }]
+        })
+        ranking2.pause()
+      }
+      if (this.rank3) {
+        // 랭크 3
+        var ranking3 = new Aplayer({
+          container: document.getElementById('ranking3'),
+          mini: true,
+          audio: [{
+            name: this.rank3.title,
+            artist: this.rank3.artist,
+            url: this.$baseURL + this.rank3.music,
+            cover: this.$baseURL + this.rank3.cover
+          }]
+        })
+        ranking3.pause()
+      }
       // 플레이리스트
       if (playlist.length !== 0) {
         const playlistPlayer = new Aplayer({
@@ -170,36 +174,38 @@ export default {
         playlistPlayer.pause()
       }
 
-      // ranking 3 music fixed
-      const fixed = new Aplayer({
-        container: document.getElementById(`fixed`),
-        fixed: true,
-        lrcType: 3,
-        audio: [
-          {
-            name: this.rank1.title,
-            artist: this.rank1.artist,
-            url: this.$baseURL + this.rank1.music,
-            cover: this.$baseURL + this.rank1.cover,
-            lrc: this.$baseURL + this.rank1.lrc
-          },
-          {
-            name: this.rank2.title,
-            artist: this.rank2.artist,
-            url: this.$baseURL + this.rank2.music,
-            cover: this.$baseURL + this.rank2.cover,
-            lrc: this.$baseURL + this.rank2.lrc
-          },
-          {
-            name: this.rank3.title,
-            artist: this.rank3.artist,
-            url: this.$baseURL + this.rank3.music,
-            cover: this.$baseURL + this.rank3.cover,
-            lrc: this.$baseURL + this.rank3.lrc
-          }
-        ]
-      })
-      fixed.pause()
+      if (this.rank3) {
+        // ranking 3 music fixed
+        const fixed = new Aplayer({
+          container: document.getElementById(`fixed`),
+          fixed: true,
+          lrcType: 3,
+          audio: [
+            {
+              name: this.rank1.title,
+              artist: this.rank1.artist,
+              url: this.$baseURL + this.rank1.music,
+              cover: this.$baseURL + this.rank1.cover,
+              lrc: this.$baseURL + this.rank1.lrc
+            },
+            {
+              name: this.rank2.title,
+              artist: this.rank2.artist,
+              url: this.$baseURL + this.rank2.music,
+              cover: this.$baseURL + this.rank2.cover,
+              lrc: this.$baseURL + this.rank2.lrc
+            },
+            {
+              name: this.rank3.title,
+              artist: this.rank3.artist,
+              url: this.$baseURL + this.rank3.music,
+              cover: this.$baseURL + this.rank3.cover,
+              lrc: this.$baseURL + this.rank3.lrc
+            }
+          ]
+        })
+        fixed.pause()
+      }
     })
   },
   methods: {
@@ -213,7 +219,7 @@ export default {
     },
     addPlaylist: function (music) {
       var playlist = JSON.parse(localStorage['playlist'])
-      var the = Math.floor(Math.random() * (1 - 0 + 1)) + 1
+      var the = Math.floor(Math.random() * 2) + 1
       var theme = ['#685eff', '#ff6d8f']
       // var baseURL = 'localhost:3000'
       var data = {}
@@ -230,7 +236,8 @@ export default {
     rateCheck: function (rate) {
       var username = localStorage['username']
       for (var i = 0; i < rate.length; i++) {
-        if (username === rate[i].username) { return true } else return false
+        return username === rate[i].username
+        // username과 랭킹의 username이 같을경우
       }
     },
     like: function (id) {

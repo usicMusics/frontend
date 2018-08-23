@@ -1,7 +1,6 @@
 <template>
-<div class="join">
-    <div id="register">REGISTER</div>
-    <div id="registerForm">
+<div id="register" class="box auth">
+    <div class="title">REGISTER</div>
       <form id="form" v-on:submit.prevent="register()">
         <div class="form-group">
           <label for="username">Username</label>
@@ -19,13 +18,12 @@
           <label class="Label" for="nickname">Nickname</label>
           <input type="text" id="nickname" placeholder="닉네임을 입력해주세요">
         </div>
-        <div id="btns">
+        <div class="btn-group">
           <input class="btn" type="submit" value="SIGN UP">
           <input class="btn" type="button" onclick="location.href = '/auth/login'" value="SIGN IN">
         </div>
       </form>
-      <a href="/" id="home">Home @ usicMusic</a>
-    </div>
+      <a href="/" class="btn-home">Home @ usicMusic</a>
 </div>
 </template>
 
@@ -65,88 +63,4 @@ export default {
 </script>
 
 <style scoped>
-.join #home {
-  color: gray;
-  text-decoration: none;
-  position: relative;
-  top: 15px;
-  font-size: .9em;
-}
-.join {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 1px 1px 10px 1px lightgray;
-  margin: 0;
-  position: absolute;
-  width: 600px;
-  top: 50%;
-  left: 50%;
-  transform: translateY(-50%) translateX(-50%);
-  /* position: absolute; */
-}
-.join #register {
-  background-image: url('../../assets/back.png');
-  background-size: 100%;
-  background-color: black;
-  padding: 80px 50px;
-  font-size: 30px;
-  color: white;
-  font-weight: bold;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-.join #registerForm {
-  padding: 40px 12%;
-}
-.join .form-group {
-  margin: 15px 0;
-  /* line-height: 30px; */
-}
-.join .form-group label {
-  text-align: left;
-  width: 20%;
-  /* float: left; */
-}
-.join .form-group input {
-  font-size: .8em;
-  width: 70%;
-
-  color: gray;
-  margin-left: 10%;
-  margin-top: 5px;
-  /* padding: 5px; */
-  line-height: 20px;
-  padding-right: 0 !important;
-  border: none;
-  border-bottom: 1px solid gray;
-  outline: none;
-}
-.join .form-group input:focus {
-  border-bottom: 1px solid rgb(240, 86, 132);
-}
-.join #btns {
-  margin: 30px 0;
-}
-.join .btn {
-  line-height: 25px;
-  display: inline-block;
-  width: 45%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: rgb(240, 86, 132);
-  color: white;
-  font-weight: bold;
-  margin-right: 5%;
-}
-.join .btn:hover {
-  background-color: rgb(255, 111, 154);
-}
-.join .btn:nth-child(2) {
-  margin-right: 0;
-  background-color: rgb(190, 190, 190);
-}
-.join .btn:nth-child(2):hover {
-  background-color: rgb(218, 218, 218);
-}
 </style>
