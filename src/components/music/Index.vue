@@ -1,63 +1,70 @@
 <template>
-  <div id="musicList">
-    <modal id="createForm" name="createForm" class="modal">
-      <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">음악 등록
-        <span style="padding-left:158px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('createForm')">X</span>
-      </h2>
-      <div style="padding:5% 8%; width:100%;">
-        <div style="float: left; padding-left:20px; line-height:28px">
-          <form v-on:submit.prevent="createMusic()" method="post" enctype="multipart/form-data" style="">
-            <label for="cover" style="cursor:pointer;"><img width="150px" id="coverImg" style="float: left; margin-right:15px;" v-bind:src="'/cover/cover.jpg'" alt=""></label>
-            <input type="file" @change="previewImage('coverImg')" id="cover" name="cover" style="display:none">
-            <input type="text" class="input" name="title" id="title" placeholder="타이틀">
-            <input type="text" class="input" name="artist" id="artist" placeholder="아티스트"><br>
-            <label for="music" id="musicLabel" class="iform">*upload to music</label><input type="file" name="music" id="music" style="display:none" @change="uploadedMusic()"><br>
-            <label for="lrc" id="lrcLabel" class="iform">upload to lrc</label><input type="file" name="lrc" id="lrc" style="display:none" @change="uploadedLrc()"><br>
-            <input type="submit" class="subbtn" value="등록">
-          </form>
+  <div id="musicList" class="music">
+    <div>
+      <modal id="createForm" name="createForm" class="modal">
+        <h2 class="modal-header"><span>음악 등록</span><span class="btn-close" @click="$modal.hide('createForm')">&times;</span></h2>
+        <div>
+          <div>
+            <form v-on:submit.prevent="createMusic()" method="post" enctype="multipart/form-data" style="">
+              <label for="cover" style="cursor:pointer;"><img width="150px" id="coverImg" style="float: left; margin-right:15px;" v-bind:src="$baseURL +'/cover/cover.jpg'" alt=""></label>
+              <div class="form-group" style="float:left;width: 200px !important;">
+                <input type="file" @change="previewImage('coverImg')" id="cover" name="cover" style="display:none">
+                <input type="text" class="input" name="title" id="title" placeholder="타이틀">
+                <input type="text" class="input" name="artist" id="artist" placeholder="아티스트"><br>
+                <label for="music" id="musicLabel" class="iform">*upload to music</label><input type="file" name="music" id="music" style="display:none" @change="uploadedMusic()"><br>
+                <label for="lrc" id="lrcLabel" class="iform">upload to lrc</label><input type="file" name="lrc" id="lrc" style="display:none" @change="uploadedLrc()"><br>
+                <input type="submit" class="btn" value="등록">
+              </div>
+            </form>
+          </div>
+        </div>
+      </modal>
+      <modal name="viewMusic" id="viewMusic" class="modal">
+        <h2 class="modal-header"><span>음악 상세보기</span><span class="btn-close" @click="$modal.hide('viewMusic')">&times;</span></h2>
+        <div class="modal-body">
+          <img width="150px" style="float: left;" v-bind:src="$baseURL + music.cover" alt="">
+          <div class="form-group" style="float:right; width: 50%;">
+            <h3 class="modal-title">{{ music.title }}</h3>
+            <p>ARTIST: {{ music.artist }}</p>
+            <p>LIKE: {{ music.rate.length}}</p>
+            <p>TYPE: <span v-if="music.isMusic">MUSIC</span><span v-else>SOURCE</span></p>
+            <p><button v-if="rateCheck(music.rate)" @click="unlike(music._id)" class="btn ubtn">UNLIKE</button><button v-else @click="like(music._id)" class="btn">+ LIKE</button>
+              <button v-if="listCheck(music)" @click="removePlaylist(music)" class="btn ubtn">UNPLAYLIST</button><button v-else @click="addPlaylist(music)" class="btn">+ PLAYLIST</button></p>
+          </div>
+        </div>
+      </modal>
+    </div>
+    <div class="box">
+      <h2 class="title">MUSIC</h2>
+      <div id="ranking">
+        <h2 style="font-size:1.2em;" class="sub-title">RANKING</h2>
+        <div id="ranking2"></div>
+        <div id="ranking1"></div>
+        <div id="ranking3"></div>
+      </div>
+      <div class="gr2">
+        <div id="musics">
+          <ul>
+            <h2 class="sub-title">MUSIC LIST</h2>
+            <draggable @start="drag=true" @end="drag=false">
+              <li v-if="music.isMusic" v-for="(music, index) in musics" :key="index">
+                <div v-bind:id="'Music' + (index + 1)" style="cursor:pointer" @click="rate(music)"></div>
+              </li>
+            </draggable>
+          </ul>
+        </div>
+        <div id="playmusic">
+          <h2 class="sub-title">PLAY LIST</h2>
+          <div id="playlist"><span style="line-height: 100px !important;">재생목록이 없습니다.</span></div>
         </div>
       </div>
-    </modal>
-    <h1 style="font-size: 3.5em;">MUSIC</h1>
-    <div id="ranking">
-      <h2 style="letter-spacing: .1em; font-size:1.2em; margin-top:20px;">RANKING</h2>
-      <div id="ranking2"></div>
-      <div id="ranking1"></div>
-      <div id="ranking3"></div>
-    </div>
-    <ul id="musics">
-      <h2>MUSIC LIST</h2>
-      <draggable @start="drag=true" @end="drag=false">
-        <li v-if="music.isMusic" v-for="(music, index) in musics" :key="index">
-          <div v-bind:id="'Music' + (index + 1)" style="cursor:pointer" @click="rate(index + 1)"></div>
-          <modal v-bind:name="'modal' + (index + 1)" class="modal">
-            <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">음악 상세보기<span style="padding-left:124px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('modal' + (index + 1))">X</span></h2>
-            <div style="padding:5% 8%; width:100%;">
-              <img width="150px" style="float: left;" v-bind:src="$baseURL + music.cover" alt="">
-              <div style="float: left; padding-left:20px; line-height:28px">
-                <h3 class="modal-title">{{ music.title }}</h3>
-                <p>ARTIST: {{ music.artist }}</p>
-                <p>LIKE: {{music.rate.length}}</p>
-                <p>TYPE: <span v-if="music.isMusic">MUSIC</span><span v-else>SOURCE</span></p>
-                <p><button v-if="rateCheck(music.rate)" @click="unlike(music._id)" class="ubtn">UNLIKE</button><button v-else @click="like(music._id)" class="mbtn">+ LIKE</button>
-                <button v-if="listCheck(music)" @click="removePlaylist(music)" class="ubtn">UNPLAYLIST</button><button v-else @click="addPlaylist(music)" class="mbtn">+ PLAYLIST</button></p>
-              </div>
-            </div>
-          </modal>
-        </li>
-      </draggable>
-      <li></li>
-      <div style="margin-top:40px;margin-right: -320px; position:relative; padding:10px;">
-        <button class="mbtn" @click="$modal.show('createForm')">음악 등록</button>
-        <button class="mbtn" onclick="location.href='/music/source'" style="margin:0;">음악 소스 창고</button>
+      <div class="btn-group">
+        <button class="btn" @click="$modal.show('createForm')">음악 등록</button>
+        <button class="btn" onclick="location.href='/music/source'">음악 소스 창고</button>
       </div>
-    </ul>
-    <div id="playmusic">
-      <h2>PLAY LIST</h2>
-      <div id="playlist"><span style="line-height: 100px !important;">재생목록이 없습니다.</span></div>
+      <a href="/" class="btn-home">Home @ usicMusic</a>
+      <div id='fixed'></div>
     </div>
-    <a href="/" style="position:relative;top: 150px; left:-230px; color:gray;">Home @ usicMusic</a>
-    <div id='fixed'></div>
   </div>
 </template>
 
@@ -70,6 +77,7 @@ export default {
   data () {
     return {
       musics: '',
+      music: {rate: {length: ''}},
       rank1: '',
       rank2: '',
       rank3: ''
@@ -79,7 +87,6 @@ export default {
     draggable
   },
   mounted: function () {
-    // var baseURL = 'http://localhost:3000'
     var playlist = []
     if (localStorage['playlist'] === undefined) localStorage['playlist'] = JSON.stringify(playlist)
     playlist = JSON.parse(localStorage['playlist'])
@@ -209,10 +216,11 @@ export default {
     })
   },
   methods: {
-    rate: function (index, $event) {
+    rate: function (music) {
       var target = event.target.className
       if (target === 'aplayer-music' || target === 'aplayer-info' || target === 'aplayer-author' || target === 'aplayer-title') {
-        this.$modal.show(`modal${index}`)
+        this.music = music
+        this.$modal.show('viewMusic')
       } else {
         console.log(target)
       }
@@ -322,48 +330,35 @@ export default {
 #musics *[class*='aplayer'] {
   cursor: pointer;
 }
-#musicList {
-  margin: 50px auto;
-  width: 42%;
-  border-radius: 10px;
-  box-shadow: 1px 1px 3px 2px lightgray;
-  background-color: white;
-  height: 800px;
+.aplayer *{
+  cursor: pointer !important;
 }
-#musicList > h1 {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background: url('../../assets/back.png');
-  background-size: 100%;
-  color: white;
-  line-height: 180px;
-  background-position: 20% 20%;
+.box {
+  height: 700px;
 }
-#musicList > #musics, #musicList > #playmusic {
-  margin-top: 20px;
-  background-color: #fff;
-  float: left;
-}
-#musicList > * > h2 {
+.sub-title {
   font-size: 1em;
   font-weight: bold;
   padding: 10px 0;
   color: rgb(240, 110, 127);
 }
-#musics {
-  padding-left: 40px;
-  width: 55%;
-  margin-right: 1%;
-}
-#musicList #playmusic {
+.gr2 > div {
+  margin-top: 20px;
+  display: inline-block;
   width: 40%;
 }
-#createForm h2 span {
-  padding-left: 130px !important;
+.form-group > * { margin-left: 10% !important; }
+.form-group label:hover { color: rgb(240, 110, 127); cursor: pointer; }
+#ranking {
+  /* margin: 0 auto; */
+  width: 60%;
+  display: inline-block;
+  text-align: center;
+  height: 160px;
 }
 #ranking > div {
   cursor: pointer;
-  display: inline-block;
+  float: left;
   border-radius: 2px;
   margin: 30px;
   transform: scale(1.5)
@@ -381,74 +376,34 @@ export default {
 #ranking3:hover {
   transform: scale(1.4) !important;
 }
-#ranking {
-  margin: 0 auto;
-  width: 400px;
-  height: 150px;
-}
 #fixed .aplayer-miniswitcher {
   background-color: rgb(255, 255, 255);
 }
-#musicList .subbtn {
-  cursor: pointer;
-  margin-top: 5px;
-  padding: 4px 60px;
-  background: none;
-  color: rgb(219, 86, 104);
-  border: 1px solid rgb(219, 86, 104);
+.btn-group {
+  margin: 20px 0 50px 0 !important;
 }
-#musicList .subbtn:hover {
-  background: rgb(219, 86, 104);
-  color: white;
-}
-#musicList .input {
-  border:none;
-  outline: none;
-  border-bottom: 1px solid gray;
-}
-.input:focus {
-  border-bottom: 1px solid rgb(219, 86, 104);
-}
-#musicList #heart:hover {
-  color: rgb(219, 86, 104);
-}
-.aplayer *{
-  cursor: pointer !important;
-}
-#musicList .mbtn {
-  outline: none;
-  cursor: pointer;
+.btn {
   padding: 3px 6px;
   background: none;
   color: rgb(219, 86, 104);
   border: 1px solid rgb(219, 86, 104);
 }
-#musicList .ubtn {
-  outline: none;
-  cursor: pointer;
+.btn:hover {
+  background-color: rgb(219, 86, 104);
+  color: white;
+}
+.ubtn {
   padding: 3px 6px;
   border: 1px solid rgb(219, 86, 104);
   background-color: rgb(219, 86, 104);
   color: white;
 }
-#musicList .ubtn:hover {
-  color: rgb(219, 86, 104);
-  background: none;
+.ubtn:hover {
+  color: rgb(219, 86, 104) !important;
+  background: none !important;
 }
-#musicList .mbtn:last-child {
-  margin-left:10px;
-}
-#musicList .mbtn:hover {
-  background-color: rgb(219, 86, 104);
-  color: white;
-}
-#musicList .iform {
+.modal img:hover {
   cursor: pointer;
-}
-#musicList .iform:hover {
-  color: rgb(219, 86, 104);
-}
-#musicList #coverImg:hover {
   transform: scale(.98)
 }
 </style>

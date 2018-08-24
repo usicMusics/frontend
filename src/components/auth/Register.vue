@@ -1,5 +1,6 @@
 <template>
-<div id="register" class="box auth">
+<div id="register" class="auth">
+  <div class="box">
     <div class="title">REGISTER</div>
       <form id="form" v-on:submit.prevent="register()">
         <div class="form-group">
@@ -24,6 +25,7 @@
         </div>
       </form>
       <a href="/" class="btn-home">Home @ usicMusic</a>
+  </div>
 </div>
 </template>
 

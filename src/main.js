@@ -15,7 +15,8 @@ import 'vue-loading-overlay/dist/vue-loading.min.css'
 import 'aplayer/dist/Aplayer.min.css'
 // import 'fontawesome/css/all.css'
 
-Vue.prototype.$baseURL = 'https://usicmusic.herokuapp.com'
+// Vue.prototype.$baseURL = 'https://usicmusic.herokuapp.com'
+Vue.prototype.$baseURL = 'http://localhost:5000'
 
 // console.log(Vue.prototype.$baseURL)
 axios.defaults.baseURL = Vue.prototype.$baseURL

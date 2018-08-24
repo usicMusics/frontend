@@ -1,22 +1,24 @@
 <template>
-    <div id="login" class="box auth">
-        <div class="title">LOGIN</div>
-        <form id="form" v-on:submit.prevent="login()">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="회원 이름을 입력해 주세요">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="비밀번호를 입력해 주세요">
-            </div>
-            <div class="btn-group">
-                <input class="btn" type="submit" value="SIGN IN">
-                <input class="btn" type="button" onclick="location.href = '/auth/register'" value="SIGN UP">
-            </div>
-        </form>
-        <a href="/" class="btn-home">Home @ usicMusic</a>
+  <div id="login" class="auth">
+    <div class="box">
+      <div class="title">LOGIN</div>
+      <form id="form" v-on:submit.prevent="login()">
+          <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" placeholder="회원 이름을 입력해 주세요">
+          </div>
+          <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="비밀번호를 입력해 주세요">
+          </div>
+          <div class="btn-group">
+              <input class="btn" type="submit" value="SIGN IN">
+              <input class="btn" type="button" onclick="location.href = '/auth/register'" value="SIGN UP">
+          </div>
+      </form>
+      <a href="/" class="btn-home">Home @ usicMusic</a>
     </div>
+  </div>
 </template>
 
 <script>

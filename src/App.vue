@@ -112,13 +112,6 @@ export default {
     .v--modal {
         border-radius: 5px !important;
     }
-    .modal-header { background: url('./assets/back.png'); line-height: 40px; padding: 5px 10px; background-size: 100%; text-align: right; }
-    .modal-header span:first-child { color: white; left: 50%; transform: translateX(-50%); position: absolute; }
-    .btn-close { cursor: pointer; font-size: 1.4em; color:white; }
-    .modal form input, .modal form textarea { width: 100% !important; resize: none !important; }
-    .modal form textarea { height: 170px !important; outline: none; }
-    .modal form textarea:focus {  border-color: rgb(204, 105, 105); }
-
     #boardList .v--modal {
         width: 500px !important;
         height: 400px !important;
@@ -127,35 +120,37 @@ export default {
         top: 50% !important;
         transform: translateX(-50%) translateY(-50%);
     }
-
-    /*#boardList div[alt='aa'] .v--modal {*/
-        /*margin: 0 !important;*/
-        /*width: 500px !important;*/
-        /*margin-left: 50px !important;*/
-        /*height: 400px !important;*/
-    /*}*/
-    #musicList .v--modal {
-        margin-left: 70px !important;
-        width: 430px !important;
-        height: 280px !important;
+    #createForm .v--modal { width: 500px !important; position: absolute;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translateX(-50%) translateY(-50%);
     }
+    #viewMusic .v--modal {
+        width: 400px !important;
+        height: 260px !important;
+        position: absolute;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translateX(-50%) translateY(-50%);
+    }
+    .modal-header { background: url('./assets/back.png'); line-height: 40px; padding: 5px 10px; background-size: 100%; text-align: right; }
+    .modal-header span:first-child { color: white; position: absolute; left: 50%; transform: translateX(-50%);}
+    .btn-close { cursor: pointer; font-size: 1.4em; color:white; }
+    .modal-body { padding: 5% 10%; }
+    .modal-body form { padding: 0; }
+    .modal form input, .modal form textarea { width: 100% !important; resize: none !important; }
+    .modal form textarea { height: 170px !important; outline: none; }
+    .modal form textarea:focus {  border-color: rgb(204, 105, 105); }
+    /*#musicList .v--modal {*/
+        /*margin-left: 70px !important;*/
+        /*width: 430px !important;*/
+        /*height: 280px !important;*/
+    /*}*/
     #uploadSource .v--modal {
         width: 240px !important;
         margin-left: 180px !important;
         height: 200px !important;
     }
-    /*#boardList .v--modal {*/
-        /*width: 40% !important;*/
-        /*height: 40% !important;*/
-        /*position: absolute;*/
-        /*margin-top: 10px !important;*/
-        /*left: 10px !important;*/
-        /*z-index: 9999;*/
-        /*!*margin: 0 !important;*!*/
-        /*!*width: 500px !important;*!*/
-        /*!*margin-left: -142px !important;*!*/
-        /*!*height: 400px !important;*!*/
-    /*}*/
     #viewSource .v--modal {
         width: 400px !important;
         height: 280px !important;

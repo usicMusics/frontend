@@ -1,7 +1,6 @@
 <template>
-  <div id='userList' v-cloak>
-      <loading :active.sync="isLoading" :is-full-page="true">
-      </loading>
+  <div id='userList' class="user">
+      <div class="box">
       <h1>회원 관리</h1>
       <table>
         <colgroup>
@@ -33,36 +32,25 @@
           </tr>
           </tbody>
           </table>
-          <a href="/" class="last" id="index">Home @ usicMusic</a>
+          <a href="/" class="btn-home">Home @ usicMusic</a>
+      </div>
   </div>
 </template>
 
 <script>
-import Loading from 'vue-loading-overlay'
-
 export default {
   name: 'UserList',
   data () {
     return {
-      users: '',
-      isLoading: 'false'
+      users: ''
     }
   },
-  components: {
-    Loading
-  },
   mounted () {
-    this.isLoading = true
     this.$http.get(`/api/user/list`)
       .then(response => {
         this.users = response.data.users
       }).catch(error => {
         console.log(error)
-      }).then(() => {
-        var self = this
-        setTimeout(function () {
-          self.isLoading = false
-        }, 300)
       })
   },
   methods: {
@@ -100,57 +88,43 @@ export default {
 [v-cloak] {
   display: none;
 }
-#userList h1 {
+.box h1 {
   background: url('../../assets/back.png');
   background-position: 20% 10%;
   background-size: 100%;
   color: white;
   line-height: 150px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
-#userList table {
+.box table {
   margin-top: 20px;
   width: 84% !important;
   text-align: center;
   margin-left: 8%;
 }
-#userList * {
+.box * {
   border-radius: .2em;
 }
-#userList {
-  border-radius: .2em;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  position: absolute;
-  background-color: #fff;
-  box-shadow: 1px 1px 1px 1px lightgray;
-  width: 32%;
-  height: 53%;
-  margin: auto;
-  text-align: center;
-}
-#userList table th {
+.box table th {
   color: rgb(204, 77, 115);
   padding: 10px 0;
 }
-#userList table td {
+.box table td {
   padding: 5px 0;
 }
-#userList table {
+.box table {
   width: 100%;
   border-collapse: collapse;
 }
-#userList .btn {
+.box .btn {
   cursor: pointer;
   background: none;
   border: 1px solid rgb(204, 77, 115);
   color:rgb(204, 77, 115);
   width: 80%;
 }
-#userList .btn:hover {
+.box .btn:hover {
   background: rgb(204, 77, 115);
   color: white;
 }
@@ -162,11 +136,11 @@ export default {
   background: none !important;
   color: rgb(204, 77, 115) !important;
 }
-#userList .last {
+.box .last {
   top: 30px !important;
   position: relative;
 }
-#userList tbody tr:hover {
+.box tbody tr:hover {
   background-color: rgb(245,245,245);
 }
 .del {

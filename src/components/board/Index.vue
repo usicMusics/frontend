@@ -1,93 +1,98 @@
 <template>
-  <div id="boardList">
-    <modal name="creBoardModal" class="modal">
-      <h2 class="modal-header">
-        <span>글 작성</span><span class="btn-close" @click="$modal.hide('creBoardModal')">&times;</span></h2>
-      <div class="modal-body">
-        <div>
-          <form action='#' method="post" @submit.prevent="write()" enctype="multipart/form-data">
-            <div class="form-group">
-              <input type="text" name="title" placeholder="글 제목" id="title">
-            </div>
-            <textarea size="1" type="text" name="content" placeholder="글 내용" id="content"></textarea><br>
-            <input type="submit" value="글 작성" class="btn">
-          </form>
+  <div id="boardList" class="board">
+    <div>
+      <modal name="creBoardModal" class="modal">
+        <h2 class="modal-header"><span>글 작성</span><span class="btn-close" @click="$modal.hide('creBoardModal')">&times;</span></h2>
+        <div class="modal-body">
+          <div>
+            <form action='#' method="post" @submit.prevent="write()" enctype="multipart/form-data">
+              <div class="form-group">
+                <input type="text" name="title" placeholder="글 제목" id="title">
+              </div>
+              <textarea size="1" type="text" name="content" placeholder="글 내용" id="content"></textarea><br>
+              <input type="submit" value="글 작성" class="btn">
+            </form>
+          </div>
         </div>
-      </div>
-    </modal>
+      </modal>
+      <modal name="viewBoardModal" class="modal">
+        <h2 class="modal-header"><span>글 보기</span><span class="btn-close" @click="$modal.hide('viewBoardModal')">&times;</span></h2>
+        <div class="modal-body">
+          <div>
+            <p><strong>제목: {{board.title}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;작성자: {{board.writer}}</p>
+            <pre>내용: {{board.content}}</pre>
+            <div class="btns">
+              <button class="btn" @click="modifyForm(board)">수정</button>
+              <button class="btn" @click="del(board._id, board.writer)">삭제</button>
+            </div>
+            <form @submit.prevent="comment(board._id)">
+              <div class="form-group">
+              <input type="text" name="comment" placeholder="comment" id="comment" style="width: 80% !important" @keyup.enter="comment">
+              <button type="submit" class="btn btn-comment">댓글</button>
+              </div>
+            </form>
+            <table style="margin: 0;">
+              <colgroup>
+                <col width="5%">
+                <col width="80%">
+                <col width="15%">
+              </colgroup>
+              <tr v-if="board.comments.length !== 0" v-for="comment in board.comments" :key="comment._id">
+                <td>{{comment.name}}:</td>
+                <td>{{comment.comment}}</td>
+                <td><button @click="deleteComment(board._id, comment._id, comment.name)" class="btn btn-delete">삭제</button></td>
+              </tr>
+              <tr v-else>
+                <td colspan="4">댓글이 없습니다</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </modal>
+      <modal name="editBoardModal" class="modal">
+        <h2 class="modal-header"><span>글 수정</span><span class="btn-close" @click="$modal.hide('editBoardModal')">&times;</span></h2>
+        <div>
+          <div>
+            <form action='' method="post" @submit.prevent="edit(board._id)" enctype="multipart/form-data">
+              <input type="text" name="title" placeholder="글 제목" id="etitle" v-bind:value="board.title">
+              <textarea size="1" type="text" name="content" placeholder="글 내용" id="econtent" v-bind:value="board.content"></textarea><br>
+              <input type="submit" value="글 수정" class="btn">
+            </form>
+          </div>
+        </div>
+      </modal>
+    </div>
     <div class="box">
-    <h2 style="font-size:2em;">게시판</h2>
-    <table>
-      <col width="5%">
-      <col width="48%">
-      <col>
-      <col>
-      <col width="7%">
-      <thead>
-        <tr>
-            <th>번호</th>
-            <th>제목</th>
-            <th>작성자</th>
-            <th>날짜</th>
-            <th>조회수</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="boards" v-for="(board, index) in boards" :key="board._id">
-          <td>{{index + 1}}</td>
-          <td class="btitle" @click="$modal.show('viewBoardModal' + (index + 1)); addCount(board._id)">{{board.title}}</td>
-          <td>{{board.writer}}</td>
-          <td>{{date(board.date)}}</td>
-          <td>{{board.count}}</td>
-          <modal v-bind:name="'viewBoardModal' + (index + 1)" class="modal">
-            <h2 class="modal-header" style="text-align:right">글 보기
-              <span style="padding-left:140px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('viewBoardModal' + (index + 1))">X</span></h2>
-              <div style="padding:5% 8%; width:100%;">
-                <div style="float: left; padding-left:20px; line-height:28px">
-                  <p><strong>제목: {{board.title}}</strong>&nbsp;&nbsp;&nbsp;&nbsp;작성자: {{board.writer}}</p>
-                  <pre>내용: {{board.content}}</pre>
-                  <button class="btn" style="padding:2px 20px !important; margin-top:110px; margin-left: -70px;" @click="modifyForm(board, index)">수정</button>
-                  <button class="btn" style="padding:2px 20px !important; margin-top:100px;" @click="del(board._id, board.writer)">삭제</button>
-                  <form @submit.prevent="comment(board._id); $modal.hide('viewBoardModal' + (index + 1));">
-                    <input type="text" name="comment" class="comment" placeholder="comment" id="comment" @keyup.enter="comment">
-                    <button type="submit" class="cbtn">댓글</button>
-                  </form>
-                  <table id="commentTable" style="margin: 0px;">
-                    <col width="5%">
-                    <col width="80%">
-                    <col width="15%">
-                      <tr v-if="board.comments.length !== 0" v-for="comment in board.comments" :key="comment._id">
-                      <td>{{comment.name}}:</td>
-                      <td style="text-align:left; padding-left:15px">{{comment.comment}}</td>
-                      <td><button @click="deleteComment(board._id, comment._id, comment.name)" id="commentDelete">삭제</button></td>
-                    </tr>
-                    <tr v-else>
-                      <td colspan="4">댓글이 없습니다</td>
-                    </tr>
-                </table>
-                </div>
-              </div>
-            </modal>
-            <modal alt="aa" v-bind:name="'editBoardModal' + (index + 1)" class="modal">
-              <h2 class="modal-header" style="text-align:right">글 수정
-                <span style="padding-left:178px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('editBoardModal' + (index + 1))">X</span></h2>
-              <div style="padding:5% 8%; width:100%;">
-                <div style="float: left; padding-left:20px; line-height:28px">
-                  <form action='' method="post" @submit.prevent="edit(board._id)" enctype="multipart/form-data">
-                    <input type="text" style="width:375px" name="title" placeholder="글 제목" id="etitle" v-bind:value="board.title">
-                    <textarea style="width:375px; height:120px;" size="1" type="text" name="content" placeholder="글 내용" id="econtent" v-bind:value="board.content"></textarea><br>
-                    <input type="submit" value="글 수정" class="tbtn btn">
-                  </form>
-                </div>
-              </div>
-            </modal>
+      <h2 class="title">게시판</h2>
+      <table>
+        <col width="5%">
+        <col width="48%">
+        <col>
+        <col>
+        <col width="7%">
+        <thead>
+          <tr>
+              <th>번호</th>
+              <th>제목</th>
+              <th>작성자</th>
+              <th>날짜</th>
+              <th>조회수</th>
           </tr>
-          <tr v-else>
-            <td colspan="5">게시글이없습니다</td>
-          </tr>
-        </tbody>
-    </table>
-      <button class="btn" @click="test()">WRITE</button><br>
+        </thead>
+        <tbody>
+          <tr v-if="boards" v-for="(board, index) in boards" :key="board._id">
+            <td>{{index + 1}}</td>
+            <td class="btitle" @click="viewBoard(board)">{{board.title}}</td>
+            <td>{{board.writer}}</td>
+            <td>{{date(board.date)}}</td>
+            <td>{{board.count}}</td>
+            </tr>
+            <tr v-else>
+              <td colspan="5">게시글이없습니다</td>
+            </tr>
+          </tbody>
+      </table>
+      <button class="btn btn-write" @click="$modal.show('creBoardModal')">WRITE</button><br>
       <a href="/" style="margin-top:20px; font-size:1em;" class="btn-home">Home @ usicMusic</a>
     </div>
   </div>
@@ -100,7 +105,8 @@ export default {
   name: 'BoardList',
   data () {
     return {
-      boards: ''
+      boards: '',
+      board: ''
     }
   },
   mounted () {
@@ -114,7 +120,7 @@ export default {
       location.href = '/api/board/write/'
     },
     view: function (id) {
-      location.href = '/api/board/view/test=' + id
+      location.href = '/api/board/view/viewBoard=' + id
       return false
     },
     write: function () {
@@ -152,6 +158,7 @@ export default {
       this.$http.get(`/api/board/${id}`)
     },
     comment: function (id) {
+      this.$modal.hide('viewBoardModal')
       const comment = document.getElementById('comment').value
       const name = localStorage['username']
       this.$http.post(`/api/board/${id}/comment`, {name, comment})
@@ -176,12 +183,12 @@ export default {
         this.$js.alert('권한이 없습니다', null, this.$js.Icons.Warning, '확인')
       }
     },
-    modifyForm: function (board, index) {
+    modifyForm: function (board) {
       if (board.writer !== localStorage['username']) {
         this.$js.alert('권한이 없습니다', null, this.$js.Icons.Warning, '확인')
       } else {
-        this.$modal.hide('viewBoardModal' + (index + 1))
-        this.$modal.show('editBoardModal' + (index + 1))
+        this.$modal.hide('viewBoardModal')
+        this.$modal.show('editBoardModal')
       }
     },
     edit: function (id) {
@@ -195,26 +202,22 @@ export default {
             location.reload()
           })
         }).catch(e => {
-          // this.$js.alert(e)
           console.log(e)
         })
     },
-    test: function () {
-      this.$modal.show('creBoardModal')
+    viewBoard: function (board) {
+      this.board = board
+      this.$modal.show('viewBoardModal')
+      this.addCount(board._id)
     }
   }
 }
 </script>
 
 <style scoped>
-  .box {
-    height: 700px;
-  }
-.comment {
-  width: 260px;
-  border: none;
-  border-bottom: 1px solid rgb(204, 105, 105);
-  outline: none;
+.box {
+  height: 700px;
+  width: 800px;
 }
 .form-group {
   margin: 0 0 10px 0;
@@ -222,31 +225,25 @@ export default {
 .form-group input {
   margin-left: 0;
 }
-.cbtn {
-  background: none;
-  padding: 2px 20px;
-  border-radius: 2px;
-  border: 1px solid rgb(204, 105, 105);
-  color: rgb(204, 105, 105);
-}
-#commentTable {
-  border-collapse: collapse;
-  width: 328px !important;
-}
-#commentDelete {
-  cursor: pointer;
-  width: 100%;
-  outline: none;
-  background: white;
-  border-radius: 2px;
-  padding: 2px 10px;
+.btns { float: right; }
+.btn {
+  position: relative;
+  margin: 10px 0 20px 0;
   color: rgb(204, 105, 105);
   border: 1px solid rgb(204, 105, 105);
+  background-color: #fff;
+  padding: 5px 20px !important;
 }
-#commentDelete:hover {
-  color: white;
-  background: rgb(204, 105, 105);
+.btn:hover { color: white; background-color: rgb(204, 105, 105); }
+.btn-delete {
+  float: right;
+  font-size: .8em !important;
+  padding: 4px 10px !important;
+  width: 60px !important;
+  margin: 4px 0 !important;
 }
+.btn-comment { width: 18.5% !important; }
+.btn-write { position: relative; transform: translateX(360%)}
 .box > table {
   border-collapse: collapse;
   width: 80%;
@@ -272,15 +269,6 @@ export default {
 .box > table tbody tr:hover {
   background-color: rgb(245, 245, 245);
 }
-.box > h2 {
-  color:white;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
-  line-height: 150px;
-  background: url('../../assets/back.png');
-  background-size: 120%;
-  background-position: 10% 12%;
-}
 .box > *:not(h2) {
   padding: 10px 10%;
 }
@@ -297,13 +285,4 @@ export default {
   resize: none;
   outline: none;
 }
-.btn {
-  position: relative;
-  margin: 10px 0 20px 0;
-  color: rgb(204, 105, 105);
-  border: 1px solid rgb(204, 105, 105);
-  background-color: #fff;
-  padding: 5px 20px !important;
-}
-.btn:hover { color: white; background-color: rgb(204, 105, 105); }
 </style>

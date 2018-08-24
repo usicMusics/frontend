@@ -1,6 +1,7 @@
 <template>
-  <div id="sourceList">
-    <h2 style="font-size: 2em;">Music Sources</h2>
+  <div id="sourceList" class="music">
+    <div class="box">
+    <h2 class="title">Music Sources</h2>
     <draggable :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
       <h2>SOURCE LIST</h2>
       <div v-if="!music.isMusic && rateChk(music)" v-bind:name="music._id" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"></div>
@@ -61,6 +62,9 @@
       </div>
     </modal>
     </span>
+    <button @click="$modal.show('uploadSource')">소스 등록</button>
+    <a href="/" class="btn-home">Home @ usicMusic</a>
+  </div>
     <section id="trash">
       <draggable :options="{group:'music'}" @start="drag=true" @add="remove($event)" @end="drag=false">
         <span class="trash">
@@ -69,8 +73,6 @@
         </span>
       </draggable>
     </section>
-    <button @click="$modal.show('uploadSource')">소스 등록</button>
-    <a href="/" style="color:gray;">Home @ usicMusic</a>
   </div>
 </template>
 
@@ -273,15 +275,6 @@ export default {
   background: rgb(219, 86, 104);
   color: white;
 }
-#sourceList > h2 {
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-  background: url('../../assets/back.png');
-  background-position: 10% 24%;
-  background-size: 120%;
-  line-height: 150px;
-  color:white;
-}
 #context-menu ul {
   padding: 0;
 }
@@ -292,15 +285,7 @@ export default {
 #context-menu li:hover {
   background-color: rgb(245, 245, 245);
 }
-#sourceList {
-  border-radius: 10px;
-  width: 40%;
-  background-color: #fff !important;
-  height: 600px;
-  box-shadow: 1px 1px 2px 1px lightgray;
-  margin: 8% auto;
-}
-#sourceList > div {
+.box > div {
   float: left;
   margin-left: 38px;
   margin-top: 60px !important;
@@ -310,8 +295,10 @@ export default {
   box-shadow: 1px 1px 2px 1px lightgray inset;
   padding: 12px;
 }
-
-#sourceList > div:nth-child(3) {
+.box {
+  width: 700px;
+}
+.box > div:nth-child(3) {
   margin-right:20px;
   margin-left: 22px;
   margin-bottom: 30px;
@@ -327,13 +314,13 @@ export default {
 .iform * {
   color: rgb(160, 160, 160);
 }
-#sourceList > div > div {
+.box > div > div {
   margin: 18px !important;
 }
 #sorceList > div > div:nth-child(n+2) {
   margin-left: 0 !important;
 }
-#sourceList > div > h2 {
+.box > div > h2 {
   font-size: 1.2em;
   font-weight: bold;
   color: rgb(255, 149, 158);
