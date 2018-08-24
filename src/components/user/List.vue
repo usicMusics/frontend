@@ -1,7 +1,7 @@
 <template>
   <div id='userList' class="user">
       <div class="box">
-      <h1>회원 관리</h1>
+      <h2 class="title">회원 관리</h2>
       <table>
         <colgroup>
           <col style="width:10%;">
@@ -28,7 +28,7 @@
                 <button class="btn enable" v-if="user.admin" @click="assignAdmin(user.username)">ENABLE</button>
                 <button class="btn disable" v-else @click="assignAdmin(user.username)">DISABLE</button>
               </td>
-              <td><i @click="userDelete(user._id)" class="del far fa-trash-alt">삭제</i></td>
+              <td><span @click="userDelete(user._id)" class="del far fa-trash-alt">삭제</span></td>
           </tr>
           </tbody>
           </table>
@@ -85,26 +85,14 @@ export default {
 </script>
 
 <style scoped>
-[v-cloak] {
-  display: none;
-}
-.box h1 {
-  background: url('../../assets/back.png');
-  background-position: 20% 10%;
-  background-size: 100%;
-  color: white;
-  line-height: 150px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+.box {
+  height: 500px;
 }
 .box table {
   margin-top: 20px;
   width: 84% !important;
   text-align: center;
   margin-left: 8%;
-}
-.box * {
-  border-radius: .2em;
 }
 .box table th {
   color: rgb(204, 77, 115);
@@ -117,9 +105,9 @@ export default {
   width: 100%;
   border-collapse: collapse;
 }
-.box .btn {
-  cursor: pointer;
-  background: none;
+.btn {
+  padding: 4px 5px !important;
+  background: white;
   border: 1px solid rgb(204, 77, 115);
   color:rgb(204, 77, 115);
   width: 80%;

@@ -342,10 +342,14 @@ export default {
   padding: 10px 0;
   color: rgb(240, 110, 127);
 }
+.gr2 {
+  width: 80%;
+  display: inline-block;
+}
 .gr2 > div {
   margin-top: 20px;
-  display: inline-block;
-  width: 40%;
+  float: left;
+  width: 50%;
 }
 .form-group > * { margin-left: 10% !important; }
 .form-group label:hover { color: rgb(240, 110, 127); cursor: pointer; }
@@ -402,7 +406,7 @@ export default {
   color: rgb(219, 86, 104) !important;
   background: none !important;
 }
-.modal img:hover {
+#coverImg:hover {
   cursor: pointer;
   transform: scale(.98)
 }

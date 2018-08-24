@@ -64,7 +64,14 @@ export default {
         margin-top: 30px;
     }
     .btn { cursor: pointer; border-radius: 4px; padding: 10px;}
-    .btn-home { color: gray; font-size: .9em; }
+    .btn-home {
+        color: gray;
+        font-size: .9em;
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
     /* auth btns */
     .auth .btn {
         line-height: 25px;

@@ -1,27 +1,8 @@
 <template>
   <div id="sourceList" class="music">
-    <div class="box">
-    <h2 class="title">Music Sources</h2>
-    <draggable :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
-      <h2>SOURCE LIST</h2>
-      <div v-if="!music.isMusic && rateChk(music)" v-bind:name="music._id" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"></div>
-    </draggable>
-    <draggable :options="{group:'music'}" @start="drag=true" @add="rate($event)" @end="drag=false">
-      <h2>FAVORITE</h2>
-        <div v-if="!music.isMusic && !rateChk(music)" v-bind:name="music._id" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"></div>
-    </draggable>
-    <span>
-      <context-menu id="context-menu" ref="ctxMenu" @ctx-open="ctxOpen">
-        <!--<li @click="$modal.show('uploadSource')">소스 등록하기</li>-->
-        <li>소스 만들기</li>
-        <li @click="$modal.show('viewSource')">상세 정보보기</li>
-        <li onclick="location.href='/music'">음악 목록</li>
-        <li @click="removeMusicSource()">삭제하기</li>
-      </context-menu>
+    <div>
       <modal id="createSource" name="createSource" class="modal">
-        <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">소스 생성
-          <span style="padding-left:158px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('createSource')">X</span>
-        </h2>
+        <h2 class="modal-header"><span>소스 생성</span><span class="btn-close" @click="$modal.hide('createSource')">&times;</span></h2>
         <div style="padding:5% 8%; width:100%;">
           <div style="float: left; padding-left:20px; line-height:28px">
               <form v-on:submit.prevent="createSource">
@@ -33,38 +14,58 @@
         </div>
       </modal>
       <modal id="uploadSource" name="uploadSource" class="modal">
-        <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">소스 등록
-          <span style="padding-left: 50px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('uploadSource')">X</span>
-        </h2>
-        <div style="padding:5% 8%; width:100%;">
-          <div style="float: left; padding-left:20px; line-height:28px">
-            <form id="uploadForm" @submit.prevent="uploadMusic()" method="post" enctype="multipart/form-data">
-              <input type="text" style="width:95%; margin-bottom: 10px;" class="inputtitle" name="title" id="title" placeholder="SourceName">
-              <input type="text" class="input" name="artist" id="artist" v-bind:value="username" style="display:none;" placeholder="아티스트"><br>
-              <label for="music"  style="width:95%; padding: 30px 10px; !important" id="musicLabel" class="iform"><i class="fas fa-file fa-lg"></i> UPLOAD FILE</label><input @change="uploadedMusic()" type="file" id="music" name="music" style="display:none">
-              <input type="submit" style="width:95%; margin-top: 10px;" class="subbtn" value="등록">
-            </form>
+        <h2 class="modal-header"><span>소스 등록</span><span class="btn-close" @click="$modal.hide('uploadSource')">&times;</span></h2>
+        <div style="margin: 5% 10%;width:80% !important;">
+          <form id="uploadForm" @submit.prevent="uploadMusic()" method="post" enctype="multipart/form-data">
+            <input type="text" style="width:95%; margin-bottom: 10px;" class="inputtitle" name="title" id="title" placeholder="SourceName">
+            <input type="text" class="input" name="artist" id="artist" v-bind:value="username" style="display:none;" placeholder="아티스트"><br>
+            <label for="music"  style="width:95%; padding: 30px 10px; !important" id="musicLabel" class="iform"><i class="fas fa-file fa-lg"></i> UPLOAD FILE</label><input @change="uploadedMusic()" type="file" id="music" name="music" style="display:none">
+            <input type="submit" style="width:95%; margin-top: 10px;" class="btn" value="등록">
+          </form>
+        </div>
+      </modal>
+      <modal id="viewSource" name="viewSource" class="modal">
+          <h2 class="modal-header"><span>소스 상세보기</span><span class="btn-close" @click="$modal.hide('viewSource')">&times;</span></h2>
+        <div class="modal-body">
+          <img width="150px" style="float: left;" v-bind:src="this.$baseURL + music.cover" alt="">
+          <div class="form-group" style="float: right; width:50%">
+            <h3 class="modal-title">{{ music.title }}</h3>
+            <p>ARTIST: {{ music.artist }}</p>
+            <p>LIKE: {{music.rate.length}}</p>
+            <p>TYPE: <span v-if="music.isMusic">MUSIC</span><span v-else>SOURCE</span></p>
+            <p><button v-if="likeChk(music.rate)" @click="unlike(music._id)" class="btn ubtn">UNFAVORITE</button><button v-else @click="like(music._id)" class="btn">+ FAVORITE</button></p>
           </div>
         </div>
       </modal>
-    <modal id="viewSource" name="viewSource" class="modal">
-      <h2 class="modal-header" style="text-align: right; line-height:45px; color:white;">소스 상세보기
-        <span style="padding-left:90px; cursor:pointer; padding-right:16px; font-size:.8em; color:white;" @click="$modal.hide('viewSource')">X</span></h2>
-      <div style="padding:5% 8%; width:100%;">
-        <img width="150px" style="float: left;" v-bind:src="this.$baseURL + music.cover" alt="">
-        <div style="float: left; padding-left:20px; line-height:28px">
-          <h3 class="modal-title">{{ music.title }}</h3>
-          <p>ARTIST: {{ music.artist }}</p>
-          <p>LIKE: {{music.rate.length}}</p>
-          <p>TYPE: <span v-if="music.isMusic">MUSIC</span><span v-else>SOURCE</span></p>
-          <p><button v-if="likeChk(music.rate)" @click="unlike(music._id)" class="ubtn">UNFAVORITE</button><button v-else @click="like(music._id)" class="mbtn">+ FAVORITE</button></p>
-        </div>
+      <context-menu id="context-menu" ref="ctxMenu" @ctx-open="ctxOpen">
+        <span v-if="chk">
+          <li @click="$modal.show('viewSource')">상세 정보보기</li>
+          <li @click="removeMusicSource()">삭제하기</li>
+        </span>
+        <span v-else>
+          <li @click="$modal.show('uploadSource')">소스 등록하기</li>
+          <li>소스 만들기</li>
+          <li onclick="location.href='/music'">음악 목록</li>
+        </span>
+      </context-menu>
+    </div>
+    <div class="box">
+      <h2 class="title">Music Sources</h2>
+      <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
+        <h2>SOURCE LIST</h2>
+        <draggable :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
+          <div v-if="!music.isMusic && rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)" @contextmenu.prevent="$refs.ctxMenu.open($event, music)"></div>
+        </draggable>
       </div>
-    </modal>
-    </span>
-    <button @click="$modal.show('uploadSource')">소스 등록</button>
-    <a href="/" class="btn-home">Home @ usicMusic</a>
-  </div>
+      <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
+        <h2>FAVORITE</h2>
+        <draggable :options="{group:'music'}" @start="drag=true" @add="rate($event)" @end="drag=false">
+          <div v-if="!music.isMusic && !rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"  @contextmenu.prevent="$refs.ctxMenu.open($event, music)"></div>
+        </draggable>
+      </div>
+      <!-- <button @click="$modal.show('uploadSource')">소스 등록</button> -->
+      <a href="/" class="btn-home">Home @ usicMusic</a>
+    </div>
     <section id="trash">
       <draggable :options="{group:'music'}" @start="drag=true" @add="remove($event)" @end="drag=false">
         <span class="trash">
@@ -87,7 +88,8 @@ export default {
     return {
       musics: '',
       music: {rate: {}, length},
-      username: ''
+      username: '',
+      chk: ''
     }
   },
   components: {
@@ -177,8 +179,12 @@ export default {
         location.reload()
       })
     },
-    ctxOpen: function (locals) {
-      console.log(locals)
+    ctxOpen: function (locals, $event) {
+      if (event.target.className === 'list') {
+        this.chk = 0
+      } else {
+        this.chk = 1
+      }
       this.music = locals
     },
     createSource: function () {
@@ -242,16 +248,16 @@ export default {
 </script>
 
 <style scoped>
-.subbtn {
-  cursor: pointer;
-  outline: none;
+.btn {
   color: rgb(219, 86, 104);
   background-color: #fff;
   border: 1px solid rgb(219, 86, 104);
   border-radius: 2px;
-  line-height: 30px;
+  /* padding: 0 10px !important; */
+  /* line-height: 30px; */
 }
-.subbtn:hover {
+#uploadSource form {padding: 5% 10% !important; width: 100% !important;}
+.btn:hover {
   color: white;
   background-color: rgb(219, 86, 104);
 }
@@ -264,17 +270,6 @@ export default {
 .inputtitle:focus {
   border-bottom: 1px solid rgb(219, 86, 104);
 }
-#viewSource button {
-  cursor: pointer;
-  outline: none;
-  color:  rgb(219, 86, 104);
-  background: none;
-  border: 1px solid rgb(219, 86, 104);
-}
-#viewSource button:hover {
-  background: rgb(219, 86, 104);
-  color: white;
-}
 #context-menu ul {
   padding: 0;
 }
@@ -284,6 +279,15 @@ export default {
 }
 #context-menu li:hover {
   background-color: rgb(245, 245, 245);
+}
+.ubtn {
+  background: rgb(219, 86, 104);
+  color: white;
+}
+.ubtn:hover {
+    color:  rgb(219, 86, 104);
+  background: none;
+  border: 1px solid rgb(219, 86, 104);
 }
 .box > div {
   float: left;
