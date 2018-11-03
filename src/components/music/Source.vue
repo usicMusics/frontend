@@ -15,8 +15,10 @@
       </modal>
       <modal id="uploadSource" name="uploadSource" class="modal">
         <h2 class="modal-header"><span>소스 등록</span><span class="btn-close" @click="$modal.hide('uploadSource')">&times;</span></h2>
-        <div style="margin: 5% 10%;width:80% !important;">
+        <div class="upload-wrap">
+          <label for="cover" style="cursor:pointer;"><img width="150px" id="coverImg" style="margin-right:15px;" v-bind:src="$baseURL +'/cover/cover.jpg'" alt=""></label>
           <form id="uploadForm" @submit.prevent="uploadMusic()" method="post" enctype="multipart/form-data">
+            <input type="file" @change="previewImage('coverImg')" id="cover" name="cover" style="display:none">
             <input type="text" style="width:95%; margin-bottom: 10px;" class="inputtitle" name="title" id="title" placeholder="SourceName">
             <input type="text" class="input" name="artist" id="artist" v-bind:value="username" style="display:none;" placeholder="아티스트"><br>
             <label for="music"  style="width:95%; padding: 30px 10px; !important" id="musicLabel" class="iform"><i class="fas fa-file fa-lg"></i> UPLOAD FILE</label><input @change="uploadedMusic()" type="file" id="music" name="music" style="display:none">
@@ -32,38 +34,45 @@
             <h3 class="modal-title">{{ music.title }}</h3>
             <p>ARTIST: {{ music.artist }}</p>
             <p>LIKE: {{music.rate.length}}</p>
-            <p>TYPE: <span v-if="music.isMusic">MUSIC</span><span v-else>SOURCE</span></p>
+            <p>TYPE: SOURCE</p>
             <p><button v-if="likeChk(music.rate)" @click="unlike(music._id)" class="btn ubtn">UNFAVORITE</button><button v-else @click="like(music._id)" class="btn">+ FAVORITE</button></p>
           </div>
         </div>
       </modal>
       <context-menu id="context-menu" ref="ctxMenu" @ctx-open="ctxOpen">
-        <span v-if="chk">
+        <span v-if="chk === 1">
           <li @click="$modal.show('viewSource')">상세 정보보기</li>
           <li @click="removeMusicSource()">삭제하기</li>
         </span>
-        <span v-else>
+        <span v-else-if="chk === 0">
           <li @click="$modal.show('uploadSource')">소스 등록하기</li>
-          <li>소스 만들기</li>
+          <!-- <li>소스 만들기</li> -->
+          <li onclick="location.href='/music'">음악 목록</li>
+        </span>
+        <span v-else>
           <li onclick="location.href='/music'">음악 목록</li>
         </span>
       </context-menu>
     </div>
-    <div class="box">
+    <div class="wrap">
       <h2 class="title">Music Sources</h2>
-      <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
-        <h2>SOURCE LIST</h2>
-        <draggable :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
-          <div v-if="!music.isMusic && rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)" @contextmenu.prevent="$refs.ctxMenu.open($event, music)"></div>
-        </draggable>
+      <div>
+        <h3>SOURCE LIST</h3>
+        <!-- <div class="overlay" style="position:absolute;height: 49.6%; width: 41.4%; background: rgba(0,0,0,.5);"><span style="color: white; font-size: 100px; position:absolute; top:50%; left: 50%; transform:translate(-50%, -50%);">+</span></div> -->
+        <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
+          <draggable id="drag" :options="{group:'music'}" @start="drag=true" @add="unrate($event)" @end="drag=false">
+            <div v-if="rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)" @contextmenu.prevent="$refs.ctxMenu.open($event, music)" class="sourcess"></div>
+          </draggable>
+        </div>
       </div>
-      <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
-        <h2>FAVORITE</h2>
-        <draggable :options="{group:'music'}" @start="drag=true" @add="rate($event)" @end="drag=false">
-          <div v-if="!music.isMusic && !rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"  @contextmenu.prevent="$refs.ctxMenu.open($event, music)"></div>
-        </draggable>
+      <div>
+        <h3>FAVORITE</h3>
+        <div class="list" @contextmenu.prevent="$refs.ctxMenu.open($event, music)">
+          <draggable id="drag" class="favorite" :options="{group:'music'}" @start="drag=true" @add="rate($event)" @end="drag=false">
+            <div v-if="!rateChk(music)" v-bind:name="music._id" v-for="(music, index) in musics" :key="index" v-bind:id="'Source' + (index + 1)"  @contextmenu.prevent="$refs.ctxMenu.open($event, music)" class="sourcess"></div>
+          </draggable>
+        </div>
       </div>
-      <!-- <button @click="$modal.show('uploadSource')">소스 등록</button> -->
       <a href="/" class="btn-home">Home @ usicMusic</a>
     </div>
     <section id="trash">
@@ -99,30 +108,33 @@ export default {
   mounted () {
     this.username = localStorage['username']
     this.$http.get('/api/music').then(response => {
-      console.log(response.data)
-      this.musics = response.data.music
+      let arr = []
+      response.data.music.forEach(element => {
+        if (!element.isMusic) arr.push(element)
+      })
+      this.musics = arr
     }).catch(error => {
       console.log(error)
     }).then(() => {
       var sources = []
-      for (var i = 1; i <= this.musics.length; i++) {
-        if (this.musics[i - 1].isMusic) continue
-        sources[i] = new Aplayer({
-          container: document.getElementById(`Source${i}`),
+      for (var i = 0; i < this.musics.length; i++) {
+        sources[i + 1] = new Aplayer({
+          container: document.getElementById(`Source${i + 1}`),
           mini: true,
           audio: [{
-            name: this.musics[i - 1].title,
-            artist: this.musics[i - 1].artist,
-            url: this.$baseURL + this.musics[i - 1].music,
-            cover: this.$baseURL + this.musics[i - 1].cover
+            name: this.musics[i].title,
+            artist: this.musics[i].artist,
+            url: this.$baseURL + this.musics[i].music,
+            cover: this.$baseURL + this.musics[i].cover
           }]
         })
-        sources[i].pause()
+        sources[i + 1].pause()
       }
     })
   },
   methods: {
     remove: function ($event) {
+      console.log('remove')
       var id = $event.item.attributes.name.value
       this.$js.confirm('정말 삭제하시겠습니까?', null, this.$js.Icons.Warning, '확인', '취소').then(result => {
         if (!result) return
@@ -138,10 +150,15 @@ export default {
       })
     },
     rate: function ($event) {
+      console.log('rate')
       var username = localStorage['username']
       var id = $event.item.attributes.name.value
       this.$http.post(`/api/music/${id}/rate`, {username}).then(response => {
+        location.reload()
         console.log(response)
+      }).catch(error => {
+        location.reload()
+        console.log(error)
       })
     },
     rateChk: function (music) {
@@ -155,9 +172,11 @@ export default {
       return true
     },
     unrate: function ($event) {
+      console.log('unrate')
       var username = localStorage['username']
       var id = $event.item.attributes.name.value
       this.$http.delete(`/api/music/${id}/rate/${username}`).then(response => {
+        location.reload()
         console.log(response)
       }).catch(error => {
         location.reload()
@@ -165,7 +184,7 @@ export default {
       })
     },
     removeMusicSource: function () {
-      // console.log(event)
+      console.log('remove music source')
       this.$js.confirm('정말 삭제하시겠습니까?', null, this.$js.Icons.Warning, '확인', '취소').then(result => {
         if (!result) return
         this.$http.delete(`/api/music/${this.music._id}`).then(response => {
@@ -180,8 +199,12 @@ export default {
       })
     },
     ctxOpen: function (locals, $event) {
-      if (event.target.className === 'list') {
-        this.chk = 0
+      if (event.target.id === 'drag') {
+        if (event.target.className === 'favorite') {
+          this.chk = 2
+        } else {
+          this.chk = 0
+        }
       } else {
         this.chk = 1
       }
@@ -242,6 +265,20 @@ export default {
       var fileName = event.target.files[0].name
       console.log(fileName)
       if (fileName !== undefined) document.getElementById('musicLabel').innerHTML = fileName
+    },
+    previewImage: function (el, $event) {
+      var files = event.target.files
+      console.log(files[0])
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i]
+        var imageType = /image.*/
+        if (!file.type.match(imageType)) continue
+        var reader = new FileReader()
+        reader.onload = function (e) {
+          document.getElementById('coverImg').src = e.target.result
+        }
+        reader.readAsDataURL(file)
+      }
     }
   }
 }
@@ -256,7 +293,14 @@ export default {
   /* padding: 0 10px !important; */
   /* line-height: 30px; */
 }
-#uploadSource form {padding: 5% 10% !important; width: 100% !important;}
+#uploadSource .upload-wrap { padding: 35px !important; }
+#uploadForm { float: left; width: 50% !important; margin: 0 !important; padding: 0 !important; padding-top: 20px !important;}
+#coverImg { float: left; }
+
+#coverImg:hover {
+  cursor: pointer;
+  transform: scale(.98)
+}
 .btn:hover {
   color: white;
   background-color: rgb(219, 86, 104);
@@ -272,6 +316,9 @@ export default {
 }
 #context-menu ul {
   padding: 0;
+}
+#drag {
+  height: 100%;
 }
 #context-menu li {
   cursor: pointer;
@@ -289,20 +336,34 @@ export default {
   background: none;
   border: 1px solid rgb(219, 86, 104);
 }
-.box > div {
+.wrap > div {
   float: left;
-  margin-left: 38px;
-  margin-top: 60px !important;
-  width: 43.8%;
-  height: 300px;
-  background-color: rgb(252,252,252);
-  box-shadow: 1px 1px 2px 1px lightgray inset;
+  width: 45%;
+  margin: 0 25px;
   padding: 12px;
 }
-.box {
+.wrap > div:nth-child(2) {
+  margin-right: 0;
+}
+.wrap > div:nth-child(4) {
+  margin-left: 21px !important;
+}
+.wrap .list {
+  width: 100%;
+  height: 300px;
+}
+#drag {
+  overflow-y: scroll;
+  overflow-x: visible;
+}
+.wrap > div > div {
+  background-color: rgb(252,252,252);
+  box-shadow: 1px 1px 2px 1px lightgray inset;
+}
+.wrap {
   width: 700px;
 }
-.box > div:nth-child(3) {
+.wrap > div:nth-child(3) {
   margin-right:20px;
   margin-left: 22px;
   margin-bottom: 30px;
@@ -312,24 +373,20 @@ export default {
 }
 .iform {
   margin: 0 !important;
+  padding: 0 !important;
   cursor: pointer;
   color: rgb(160, 160, 160);
 }
 .iform * {
   color: rgb(160, 160, 160);
 }
-.box > div > div {
-  margin: 18px !important;
+.wrap > div > div > div > div {
+  margin: 20px 10px 10px 15px;
 }
-#sorceList > div > div:nth-child(n+2) {
-  margin-left: 0 !important;
-}
-.box > div > h2 {
+.wrap > div > h3 {
   font-size: 1.2em;
   font-weight: bold;
   color: rgb(255, 149, 158);
-  background-color: #fff;
-  margin-top:-45px;
   margin-bottom: 20px !important;
 }
 .aplayer  {
@@ -432,4 +489,5 @@ section {
   width: 0;
   height: 0;
 }
+
 </style>
