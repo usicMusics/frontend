@@ -31,13 +31,14 @@
               <button type="submit" class="btn btn-comment">댓글</button>
               </div>
             </form>
-            <table style="margin: 0;">
+            <div  id="commentList">
+            <table>
               <colgroup>
                 <col width="5%">
                 <col width="80%">
                 <col width="15%">
               </colgroup>
-              <tr v-if="board.comments.length !== 0" v-for="comment in board.comments" :key="comment._id">
+              <tr v-if="board.comments.length" v-for="comment in board.comments" :key="comment._id">
                 <td>{{comment.name}}:</td>
                 <td>{{comment.comment}}</td>
                 <td><button @click="deleteComment(board._id, comment._id, comment.name)" class="btn btn-delete">삭제</button></td>
@@ -46,6 +47,7 @@
                 <td colspan="4">댓글이 없습니다</td>
               </tr>
             </table>
+            </div>
           </div>
         </div>
       </modal>
@@ -62,8 +64,9 @@
         </div>
       </modal>
     </div>
-    <div class="box">
+    <div class="wrap">
       <h2 class="title">게시판</h2>
+      <div class="table-wrap">
       <table>
         <col width="5%">
         <col width="48%">
@@ -92,6 +95,7 @@
             </tr>
           </tbody>
       </table>
+      </div>
       <button class="btn btn-write" @click="$modal.show('creBoardModal')">WRITE</button><br>
       <a href="/" style="margin-top:20px; font-size:1em;" class="btn-home">Home @ usicMusic</a>
     </div>
@@ -106,14 +110,11 @@ export default {
   data () {
     return {
       boards: '',
-      board: ''
+      board: {comments: { length: 0 }}
     }
   },
   mounted () {
-    this.$http.get(`/api/board`)
-      .then((result) => {
-        this.boards = result.data.boards
-      })
+    this.getBoard()
   },
   methods: {
     move: function () {
@@ -158,13 +159,16 @@ export default {
       this.$http.get(`/api/board/${id}`)
     },
     comment: function (id) {
-      this.$modal.hide('viewBoardModal')
       const comment = document.getElementById('comment').value
       const name = localStorage['username']
       this.$http.post(`/api/board/${id}/comment`, {name, comment})
         .then((result) => {
           this.$js.alert('댓글이 작성되었습니다', null, this.$js.Icons.Success, '확인').then(() => {
-            location.reload()
+            this.$http.get(`/api/board/${id}`).then(res => {
+              this.$modal.hide('viewBoardModal')
+              this.viewBoard(res.data.message)
+              this.getBoard()
+            })
           })
         })
     },
@@ -176,7 +180,11 @@ export default {
           if (!result) return false
           this.$http.delete(`/api/board/${id}/comment/${cId}`)
             .then((response) => {
-              location.reload()
+              this.$http.get(`/api/board/${id}`).then(res => {
+                this.$modal.hide('viewBoardModal')
+                this.viewBoard(res.data.message)
+                this.getBoard()
+              })
             })
         })
       } else {
@@ -199,7 +207,11 @@ export default {
         .then(response => {
           if (response.data.error) throw response.data.error
           this.$js.alert('수정 되었습니다', null, this.$js.Icons.Success, '확인').then(() => {
-            location.reload()
+            this.$http.get(`/api/board/${id}`).then(res => {
+              this.$modal.hide('editBoardModal')
+              this.viewBoard(res.data.message)
+            })
+            this.getBoard()
           })
         }).catch(e => {
           console.log(e)
@@ -209,13 +221,19 @@ export default {
       this.board = board
       this.$modal.show('viewBoardModal')
       this.addCount(board._id)
+    },
+    getBoard: function () {
+      this.$http.get(`/api/board`)
+        .then((result) => {
+          this.boards = result.data.boards
+        })
     }
   }
 }
 </script>
 
 <style scoped>
-.box {
+.wrap {
   height: 700px;
   width: 800px;
 }
@@ -244,45 +262,49 @@ export default {
 }
 .btn-comment { width: 18.5% !important; }
 .btn-write { position: relative; transform: translateX(360%)}
-.box > table {
+.wrap .table-wrap table {
   border-collapse: collapse;
   width: 80%;
   margin-top: 20px;
   margin-left:10%;
 }
-.box .btitle {
+.wrap .btitle {
   color: rgb(204, 105, 105) !important;
   cursor: pointer;
 }
-.box .btitle:hover {
+.wrap .btitle:hover {
   color: rgb(145, 98, 255) !important;
 }
-.box > table thead * {
+.wrap .table-wrap table thead * {
   color: rgb(204, 105, 105);
 }
-.box > table thead tr {
+.wrap .table-wrap table thead tr {
   line-height: 40px;
 }
-.box > table tbody tr {
+.wrap .table-wrap table tbody tr {
   line-height: 30px;
 }
-.box > table tbody tr:hover {
+.wrap .table-wrap table tbody tr:hover {
   background-color: rgb(245, 245, 245);
 }
-.box > *:not(h2) {
+.wrap .table-wrap > table {
   padding: 10px 10%;
 }
-.box #title, #etitle {
+.wrap #title, #etitle {
   outline: none;
   border: none;
   border-bottom: 1px solid gray !important;
   padding: 3px 0;
   margin-bottom: 7px;
 }
-.box #content, #econtent {
+.wrap #content, #econtent {
   border-radius: 2px;
   height: 200px !important;
   resize: none;
   outline: none;
+}
+.table-wrap {
+  height: 390px;
+  overflow-y: scroll;
 }
 </style>
