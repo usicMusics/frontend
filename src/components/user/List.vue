@@ -1,37 +1,39 @@
 <template>
   <div id='userList' class="user">
-      <div class="box">
-      <h2 class="title">회원 관리</h2>
-      <table>
-        <colgroup>
-          <col style="width:10%;">
-          <col style="width:30%;">
-          <col style="width:30%;">
-          <col style="width:15%;">
-          <col style="width:15%;">
-        </colgroup>
-        <thead>
-          <tr>
-              <th>번호</th>
-              <th>회원이름</th>
-              <th>닉네임</th>
-              <th>관리자</th>
-              <th>삭제</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="(user, index) in users" :key="index">
-              <td>{{index + 1}}</td>
-              <td>{{user.username}}</td>
-              <td>{{user.nickname}}</td>
-              <td>
-                <button class="btn enable" v-if="user.admin" @click="assignAdmin(user.username)">ENABLE</button>
-                <button class="btn disable" v-else @click="assignAdmin(user.username)">DISABLE</button>
-              </td>
-              <td><span @click="userDelete(user._id)" class="del far fa-trash-alt">삭제</span></td>
-          </tr>
-          </tbody>
+      <div class="wrap">
+        <h2 class="title">회원 관리</h2>
+        <div class="user-table">
+        <table>
+          <colgroup>
+            <col style="width:10%;">
+            <col style="width:30%;">
+            <col style="width:30%;">
+            <col style="width:15%;">
+            <col style="width:15%;">
+          </colgroup>
+          <thead>
+            <tr>
+                <th>번호</th>
+                <th>회원이름</th>
+                <th>닉네임</th>
+                <th>관리자</th>
+                <th>삭제</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(user, index) in users" :key="index">
+                <td>{{index + 1}}</td>
+                <td>{{user.username}}</td>
+                <td>{{user.nickname}}</td>
+                <td>
+                  <button class="btn enable" v-if="user.admin" @click="assignAdmin(user.username)">ENABLE</button>
+                  <button class="btn disable" v-else @click="assignAdmin(user.username)">DISABLE</button>
+                </td>
+                <td><span @click="userDelete(user._id)" class="del far fa-trash-alt">삭제</span></td>
+            </tr>
+            </tbody>
           </table>
+          </div>
           <a href="/" class="btn-home">Home @ usicMusic</a>
       </div>
   </div>
@@ -85,23 +87,23 @@ export default {
 </script>
 
 <style scoped>
-.box {
+.wrap {
   height: 500px;
 }
-.box table {
+.wrap table {
   margin-top: 20px;
   width: 84% !important;
   text-align: center;
   margin-left: 8%;
 }
-.box table th {
+.wrap table th {
   color: rgb(204, 77, 115);
   padding: 10px 0;
 }
-.box table td {
+.wrap table td {
   padding: 5px 0;
 }
-.box table {
+.wrap table {
   width: 100%;
   border-collapse: collapse;
 }
@@ -112,9 +114,13 @@ export default {
   color:rgb(204, 77, 115);
   width: 80%;
 }
-.box .btn:hover {
+.wrap .btn:hover {
   background: rgb(204, 77, 115);
   color: white;
+}
+.user-table {
+  height: 245px;
+  overflow-y: scroll;
 }
 .enable {
   background: rgb(204, 77, 115) !important;
@@ -124,11 +130,11 @@ export default {
   background: none !important;
   color: rgb(204, 77, 115) !important;
 }
-.box .last {
+.wrap .last {
   top: 30px !important;
   position: relative;
 }
-.box tbody tr:hover {
+.wrap tbody tr:hover {
   background-color: rgb(245,245,245);
 }
 .del {
